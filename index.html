@@ -303,10 +303,84 @@
 
 </head>
 <body>
+    <!-- ===== LOGIN OVERLAY ===== -->
+    <div id="loginOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,10,5,0.98);z-index:99999;display:flex;justify-content:center;align-items:center;flex-direction:column;">
+        <h1 style="font-family:'Orbitron',sans-serif;font-size:2rem;color:#39ff14;text-shadow:0 0 20px rgba(57,255,20,0.5);margin-bottom:20px;">🔐 DRIP ACCESS</h1>
+        <div style="background:rgba(8,18,10,0.95);border:2px solid #39ff14;border-radius:10px;padding:30px;max-width:350px;width:90%;">
+            <p style="color:#c8ffd4;margin-bottom:15px;text-align:center;">Enter access password:</p>
+            <input type="password" id="loginPassword" placeholder="Password" 
+                   style="width:100%;padding:12px;border:1px solid #39ff14;border-radius:5px;background:#0a1a0a;color:#39ff14;font-size:1.1rem;text-align:center;margin-bottom:10px;"
+                   onkeypress="if(event.key==='Enter')checkLogin()">
+            <button onclick="checkLogin()" class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;">
+                ACCESS
+            </button>
+            <p id="loginError" style="color:#ff4444;margin-top:10px;text-align:center;display:none;">Incorrect password!</p>
+        </div>
+        <p style="color:rgba(200,255,212,0.3);margin-top:20px;font-size:0.8rem;">Protected by Drip Security</p>
+    </div>
+
+    <script>
+    // ===== LOGIN SYSTEM =====
+    const CORRECT_PASSWORD = "Drip2026mx";
+    const AUTH_KEY = "drip_auth_ips";
+    
+    function getUserIP() {
+        // Generate a pseudo-IP based on available browser data
+        const data = navigator.userAgent + screen.width + screen.height + new Date().toDateString();
+        let hash = 0;
+        for(let i = 0; i < data.length; i++) {
+            hash = ((hash << 5) - hash) + data.charCodeAt(i);
+            hash = hash & hash;
+        }
+        return "user_" + Math.abs(hash).toString(36);
+    }
+    
+    function checkLogin() {
+        const password = document.getElementById('loginPassword').value;
+        const errorEl = document.getElementById('loginError');
+        
+        if (password === CORRECT_PASSWORD) {
+            // Save this IP/browser as authorized
+            const authData = JSON.parse(localStorage.getItem(AUTH_KEY) || '{}');
+            const userIP = getUserIP();
+            authData[userIP] = {
+                authorized: true,
+                lastLogin: new Date().toISOString()
+            };
+            localStorage.setItem(AUTH_KEY, JSON.stringify(authData));
+            
+            // Hide login overlay
+            document.getElementById('loginOverlay').style.display = 'none';
+            console.log("Login successful! IP/Browser:", userIP);
+        } else {
+            errorEl.style.display = 'block';
+            document.getElementById('loginPassword').value = '';
+            setTimeout(() => errorEl.style.display = 'none', 3000);
+        }
+    }
+    
+    function checkAuth() {
+        const authData = JSON.parse(localStorage.getItem(AUTH_KEY) || '{}');
+        const userIP = getUserIP();
+        
+        if (authData[userIP] && authData[userIP].authorized) {
+            // Already authorized, hide login
+            document.getElementById('loginOverlay').style.display = 'none';
+            console.log("Auto-login for authorized user:", userIP);
+        } else {
+            // Need to login
+            document.getElementById('loginOverlay').style.display = 'flex';
+        }
+    }
+    
+    // Check auth on load
+    checkAuth();
+    </script>
+
     <div class="container">
         <header>
             <h1 class="logo">Drip</h1>
-            <button class="btn btn-secondary" id="btn-clear-config" style="font-size:0.6rem;padding:2px 8px;height:22px;" onclick="clearConfig();location.reload();">Clear Data</button>
+            <button class="btn btn-secondary" id="btn-clear-config" style="font-size:0.6rem;padding:2px 8px;height:22px;" onclick="if(confirm('Clear all saved data including login sessions?')){clearConfig();localStorage.removeItem('drip_auth_ips');location.reload();}">Clear Data</button>
             <p class="subtitle">Automation Tool</p>
         </header>
 
