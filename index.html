@@ -320,11 +320,10 @@
         <!-- DOWNLOAD BUTTON FOR LOCAL VERSION -->
         <div style="margin-top:25px;padding:20px;background:rgba(57,255,20,0.1);border:2px dashed #39ff14;border-radius:10px;max-width:400px;text-align:center;">
             <p style="color:#ffaa00;font-size:0.9rem;margin-bottom:10px;">📥 Download LOCAL version for better Prison Escape</p>
-            <a href="https://raw.githubusercontent.com/danieldriip/DripTheBest/main/index.html" download="DripTheBest-Local.html">
-                <button style="background:linear-gradient(135deg,#ff6600,#ff9500);border:none;color:white;padding:15px 30px;font-size:1.1rem;font-weight:bold;border-radius:8px;cursor:pointer;box-shadow:0 4px 15px rgba(255,102,0,0.4);">
-                    ⬇️ DOWNLOAD HTML FILE
-                </button>
-            </a>
+            <button onclick="downloadAfterLogin()" style="background:linear-gradient(135deg,#ff6600,#ff9500);border:none;color:white;padding:15px 30px;font-size:1.1rem;font-weight:bold;border-radius:8px;cursor:pointer;box-shadow:0 4px 15px rgba(255,102,0,0.4);">
+                ⬇️ DOWNLOAD HTML FILE
+            </button>
+            <p id="downloadError" style="color:#ff4444;font-size:0.8rem;margin-top:8px;display:none;">Enter password first to download!</p>
             <p style="color:rgba(200,255,212,0.5);font-size:0.7rem;margin-top:8px;">Open downloaded file locally for FULL functionality</p>
         </div>
         
@@ -391,6 +390,27 @@
         }
     }
     
+    function downloadAfterLogin() {
+        const authData = JSON.parse(localStorage.getItem(AUTH_KEY) || '{}');
+        const userIP = getUserIP();
+        
+        if (authData[userIP] && authData[userIP].authorized) {
+            // Authorized - download file
+            const link = document.createElement('a');
+            link.href = 'https://raw.githubusercontent.com/danieldriip/DripTheBest/main/index.html';
+            link.download = 'DripTheBest-Local.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            // Not authorized - show error and focus password
+            const errorEl = document.getElementById('downloadError');
+            const passwordInput = document.getElementById('loginPassword');
+            if (errorEl) errorEl.style.display = 'block';
+            if (passwordInput) passwordInput.focus();
+        }
+    }
+    
     // Run when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', checkAuth);
@@ -403,9 +423,7 @@
         <header>
             <h1 class="logo">Drip</h1>
             <button class="btn btn-secondary" id="btn-clear-config" style="font-size:0.6rem;padding:2px 8px;height:22px;" onclick="if(confirm('Clear all saved data including login sessions?')){clearConfig();localStorage.removeItem('drip_auth_ips');location.reload();}">Clear Data</button>
-            <a href="https://raw.githubusercontent.com/danieldriip/DripTheBest/main/index.html" download="DripTheBest-Local.html" style="text-decoration:none;">
-                <button style="background:linear-gradient(135deg,#ff6600,#ff9500);border:none;color:white;padding:4px 10px;font-size:0.65rem;font-weight:bold;border-radius:5px;cursor:pointer;height:22px;">⬇️ LOCAL</button>
-            </a>
+            <button onclick="downloadAfterLogin()" style="background:linear-gradient(135deg,#ff6600,#ff9500);border:none;color:white;padding:4px 10px;font-size:0.65rem;font-weight:bold;border-radius:5px;cursor:pointer;height:22px;">⬇️ LOCAL</button>
             <p class="subtitle">Automation Tool</p>
         </header>
 
