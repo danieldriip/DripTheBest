@@ -203,11 +203,110 @@
         .field-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
         .field-group > label { font-size: 0.7rem; color: rgba(200, 255, 212, 0.5); }
     </style>
+    <script>
+    // ===== LOCAL STORAGE SAVE/LOAD =====
+    const STORAGE_KEY = 'dripTheBest_config';
+    
+    function saveConfig() {
+        const config = {
+            rc: document.getElementById('rc')?.value || '',
+            planet: document.getElementById('planet')?.value || '',
+            planet2: document.getElementById('planet2')?.value || '',
+            whitelist: document.getElementById('whitelist')?.value || '',
+            whitelist2: document.getElementById('whitelist2')?.value || '',
+            whitelist3: document.getElementById('whitelist3')?.value || '',
+            attack: document.getElementById('attack')?.value || '1880',
+            waiting: document.getElementById('waiting')?.value || '1880',
+            increment: document.getElementById('increment')?.value || '5',
+            decrement: document.getElementById('decrement')?.value || '5',
+            devtype: document.getElementById('devtype')?.value || '350',
+            green: document.getElementById('green')?.checked || true,
+            autoescape: document.getElementById('autoescape')?.checked || true,
+            secs: document.getElementById('secs')?.checked || false,
+            sleep: document.getElementById('sleep')?.checked || false
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        console.log('Config saved:', config);
+    }
+    
+    function loadConfig() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) {
+            console.log('No saved config found');
+            return;
+        }
+        try {
+            const config = JSON.parse(saved);
+            
+            // Restore text/number inputs
+            if (document.getElementById('rc')) document.getElementById('rc').value = config.rc || '';
+            if (document.getElementById('planet')) document.getElementById('planet').value = config.planet || '';
+            if (document.getElementById('planet2')) document.getElementById('planet2').value = config.planet2 || '';
+            if (document.getElementById('whitelist')) document.getElementById('whitelist').value = config.whitelist || '';
+            if (document.getElementById('whitelist2')) document.getElementById('whitelist2').value = config.whitelist2 || '';
+            if (document.getElementById('whitelist3')) document.getElementById('whitelist3').value = config.whitelist3 || '';
+            if (document.getElementById('attack')) document.getElementById('attack').value = config.attack || '1880';
+            if (document.getElementById('waiting')) document.getElementById('waiting').value = config.waiting || '1880';
+            if (document.getElementById('increment')) document.getElementById('increment').value = config.increment || '5';
+            if (document.getElementById('decrement')) document.getElementById('decrement').value = config.decrement || '5';
+            
+            // Restore select
+            if (document.getElementById('devtype')) document.getElementById('devtype').value = config.devtype || '350';
+            
+            // Restore checkboxes
+            if (document.getElementById('green')) document.getElementById('green').checked = config.green !== false;
+            if (document.getElementById('autoescape')) document.getElementById('autoescape').checked = config.autoescape !== false;
+            if (document.getElementById('secs')) document.getElementById('secs').checked = config.secs || false;
+            if (document.getElementById('sleep')) document.getElementById('sleep').checked = config.sleep || false;
+            
+            console.log('Config loaded from localStorage');
+            document.getElementById('sec').innerHTML += ">>> Config loaded from localStorage\r\n";
+        } catch (e) {
+            console.error('Error loading config:', e);
+        }
+    }
+    
+    function clearConfig() {
+        localStorage.removeItem(STORAGE_KEY);
+        console.log('Config cleared');
+    }
+    
+    // Auto-save on input changes
+    function initAutoSave() {
+        const selectors = ['#rc', '#planet', '#planet2', '#whitelist', '#whitelist2', '#whitelist3', 
+                         '#attack', '#waiting', '#increment', '#decrement', '#devtype',
+                         '#green', '#autoescape', '#secs', '#sleep'];
+        
+        selectors.forEach(sel => {
+            const el = document.querySelector(sel);
+            if (el) {
+                el.addEventListener('change', saveConfig);
+                el.addEventListener('input', saveConfig);
+            }
+        });
+        
+        // Also add click listeners for checkboxes
+        ['green', 'autoescape', 'secs', 'sleep'].forEach(id => {
+            const cb = document.getElementById(id);
+            if (cb) {
+                cb.addEventListener('click', saveConfig);
+            }
+        });
+    }
+    
+    // Load config when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        loadConfig();
+        setTimeout(initAutoSave, 500);
+    });
+    </script>
+
 </head>
 <body>
     <div class="container">
         <header>
             <h1 class="logo">Drip</h1>
+            <button class="btn btn-secondary" id="btn-clear-config" style="font-size:0.6rem;padding:2px 8px;height:22px;" onclick="clearConfig();location.reload();">Clear Data</button>
             <p class="subtitle">Automation Tool</p>
         </header>
 
