@@ -304,7 +304,7 @@
 </head>
 <body>
     <!-- ===== LOGIN OVERLAY ===== -->
-    <div id="loginOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,10,5,0.98);z-index:99999;display:flex;justify-content:center;align-items:center;flex-direction:column;">
+    <div id="loginOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,10,5,0.98);z-index:99999;display:flex!important;justify-content:center;align-items:center;flex-direction:column;visibility:visible!important;opacity:1!important;">
         <h1 style="font-family:'Orbitron',sans-serif;font-size:2rem;color:#39ff14;text-shadow:0 0 20px rgba(57,255,20,0.5);margin-bottom:20px;">🔐 DRIP ACCESS</h1>
         <div style="background:rgba(8,18,10,0.95);border:2px solid #39ff14;border-radius:10px;padding:30px;max-width:350px;width:90%;">
             <p style="color:#c8ffd4;margin-bottom:15px;text-align:center;">Enter access password:</p>
@@ -368,13 +368,23 @@
             document.getElementById('loginOverlay').style.display = 'none';
             console.log("Auto-login for authorized user:", userIP);
         } else {
-            // Need to login
-            document.getElementById('loginOverlay').style.display = 'flex';
+            // Need to login - FORCE show the overlay
+            const overlay = document.getElementById('loginOverlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                overlay.style.visibility = 'visible';
+                overlay.style.opacity = '1';
+            }
+            console.log("Login required for:", userIP);
         }
     }
     
-    // Check auth on load
-    checkAuth();
+    // Run when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    } else {
+        checkAuth();
+    }
     </script>
 
     <div class="container">
