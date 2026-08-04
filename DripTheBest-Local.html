@@ -521,6 +521,37 @@
         .toLowerCase();
 }
 
+// Enhanced list checking - case insensitive AND preserves original for matching
+ function clanInList(clan, list) {
+    if (!Array.isArray(list)) {
+        return false;
+    }
+
+    const normalizedClan = normalizeListValue(clan);
+    console.log("Checking clan:", clan, "-> normalized:", normalizedClan, "in list:", list);
+
+    return list.some(item => {
+        const normalizedItem = normalizeListValue(item);
+        console.log("  Comparing:", normalizedItem, "===", normalizedClan, "?", normalizedItem === normalizedClan);
+        return normalizedItem === normalizedClan;
+    });
+}
+
+ function valueInList(value, list) {
+    if (!Array.isArray(list)) {
+        return false;
+    }
+
+    const normalizedValue = normalizeListValue(value);
+    console.log("Checking value:", value, "-> normalized:", normalizedValue, "in list:", list);
+
+    return list.some(item => {
+        const normalizedItem = normalizeListValue(item);
+        console.log("  Comparing:", normalizedItem, "===", normalizedValue, "?", normalizedItem === normalizedValue);
+        return normalizedItem === normalizedValue;
+    });
+}
+
 const attackTimers = new Map();
 const defenceTimers = new Map();
 
@@ -1107,11 +1138,13 @@ navigator.wakeLock;
                 clanInList(clan, whitelistClans) ||
                 valueInList(nick, whitelistNicks);
 
-              console.log("353 detectado:", {
+              console.log("=== 353 DETECTADO ===", {
                 clan, nick, id: userId, timing,
                 modoListaNegra: blacklistMode,
                 estaNaListaNegra,
-                estaProtegido
+                estaProtegido,
+                blacklist: blacklist,
+                whitelistNicks: whitelistNicks
               });
 
               if (blacklistMode) {
