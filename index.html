@@ -1259,15 +1259,19 @@ navigator.wakeLock;
                 const escapeUrl2 = "https://galaxy.mobstudio.ru/services/?userID="+useridg+"&password="+passwordg+"&a=jail_free&usercur="+useridg+"&by_escapes=1&random="+Math.random();
                 fetch(escapeUrl2, {
                   method: "GET",
-                  
+                  mode: fetchMode,
                   headers: {
                     "X-Galaxy-User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
                     "X-Galaxy-Lng": "en",
                     "X-Galaxy-Client-Ver": "9.5",
                   },
-                }).then(() => {
-                  console.log("Auto-escape request sent");
-                  document.getElementById("sec").innerHTML += ">>> AUTO-ESCAPE SENT (no-cors)\r\n";
+                }).then(r => r.text()).then(d => {
+                  console.log("Auto-escape response:", d);
+                  document.getElementById("sec").innerHTML += ">>> AUTO-ESCAPE RESPONSE: " + d.substring(0, 80) + "\r\n";
+                  if (d.indexOf("ok") === -1 && d.indexOf("1") === -1 && autoescape.checked) {
+                    escapeRetryCount = 0;
+                    escapeRetry();
+                  }
                 }).catch(e => {
                   console.error("Auto-escape failed:", e);
                   document.getElementById("sec").innerHTML += ">>> AUTO-ESCAPE ERROR: " + e.message + "\r\n";
@@ -1280,15 +1284,19 @@ navigator.wakeLock;
               const escapeUrl3 = "https://galaxy.mobstudio.ru/services/?userID="+useridg+"&password="+passwordg+"&a=jail_free&usercur="+useridg+"&by_escapes=1&random="+Math.random();
               fetch(escapeUrl3, {
                 method: "GET",
-                
+                mode: fetchMode,
                 headers: {
                   "X-Galaxy-User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
                   "X-Galaxy-Lng": "en",
                   "X-Galaxy-Client-Ver": "9.5",
                 },
-              }).then(() => {
-                console.log("Auto-escape request sent");
-                document.getElementById("sec").innerHTML += ">>> AUTO-ESCAPE SENT (no-cors)\r\n";
+              }).then(r => r.text()).then(d => {
+                console.log("Auto-escape response:", d);
+                document.getElementById("sec").innerHTML += ">>> AUTO-ESCAPE RESPONSE: " + d.substring(0, 80) + "\r\n";
+                if (d.indexOf("ok") === -1 && d.indexOf("1") === -1 && autoescape.checked) {
+                  escapeRetryCount = 0;
+                  escapeRetry();
+                }
               }).catch(e => {
                 console.error("Auto-escape failed:", e);
                 document.getElementById("sec").innerHTML += ">>> AUTO-ESCAPE ERROR: " + e.message + "\r\n";
@@ -1345,12 +1353,12 @@ navigator.wakeLock;
         try {
           console.log("Escape button clicked - attempting prison escape...");
           document.getElementById("sec").innerHTML += ">>> Sending escape request...\r\n";
-          // Use no-cors mode to bypass CORS restrictions from GitHub Pages
+          // Local mode - no CORS needed
           fetch(
             "https://galaxy.mobstudio.ru/services/?userID="+useridg+"&password="+passwordg+"&a=jail_free&usercur="+useridg+"&by_escapes=1&random="+Math.random(),
             {
               method: "GET",
-              
+              mode: fetchMode,
               headers: {
                 "X-Galaxy-User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
                 "X-Galaxy-Scr-Dpi": "1",
@@ -1367,7 +1375,7 @@ navigator.wakeLock;
             }
           ).then(() => {
             console.log("Escape request sent successfully");
-            document.getElementById("sec").innerHTML += ">>> ESCAPE REQUEST SENT (no-cors)\r\n";
+            document.getElementById("sec").innerHTML += ">>> ESCAPE REQUEST SENT (success)\r\n";
           }).catch(err => {
             console.error("Escape error:", err);
             document.getElementById("sec").innerHTML += ">>> ESCAPE ERROR: " + err.message + "\r\n";
@@ -1393,6 +1401,7 @@ navigator.wakeLock;
         
         fetch("https://galaxy.mobstudio.ru/services/?userID="+useridg+"&password="+passwordg+"&a=jail_free&usercur="+useridg+"&by_escapes=1&random="+Math.random(), {
           method: "GET",
+          mode: fetchMode,
           headers: {
             "X-Galaxy-User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
             "X-Galaxy-Scr-Dpi": "1",
