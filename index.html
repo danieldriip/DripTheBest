@@ -1155,13 +1155,43 @@ navigator.wakeLock;
               let pln = (snippets[1] || '').toLowerCase();
      
               if(/^(prison|pris[ãa]o|pres[íi]dio)/i.test(pln)) {
-                let escape = document.getElementById("escape");
-                salir();Reconexion();
+                console.log("PRISON MSG DETECTED - Attempting escape via API...");
+                document.getElementById("sec").innerHTML += ">>> PRISON MSG DETECTED - ESCAPING...\r\n";
+                const escapeUrl2 = "https://galaxy.mobstudio.ru/services/?userID="+useridg+"&password="+passwordg+"&a=jail_free&usercur="+useridg+"&by_escapes=1&random="+Math.random();
+                fetch(escapeUrl2, {
+                  method: "GET",
+                  headers: {
+                    "X-Galaxy-User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+                    "X-Galaxy-Lng": "en",
+                    "X-Galaxy-Client-Ver": "9.5",
+                  },
+                }).then(r => r.text()).then(d => {
+                  console.log("Auto-escape response:", d);
+                  document.getElementById("sec").innerHTML += ">>> ESCAPE RESPONSE: " + d.substring(0, 100) + "\r\n";
+                }).catch(e => {
+                  console.error("Auto-escape failed:", e);
+                  document.getElementById("sec").innerHTML += ">>> ESCAPE ERROR: " + e.message + "\r\n";
+                });
               }
             }
 			if (snippets[1] === "PRISON" || (snippets[1]||'').toLowerCase() === "prisão" || (snippets[1]||'').toLowerCase() === "prisao") {
-let escape = document.getElementById("escape");
-                salir();Reconexion();
+console.log("PRISON MSG DETECTED - Attempting escape via API...");
+document.getElementById("sec").innerHTML += ">>> PRISON MSG DETECTED - ESCAPING...\r\n";
+const escapeUrl2 = "https://galaxy.mobstudio.ru/services/?userID="+useridg+"&password="+passwordg+"&a=jail_free&usercur="+useridg+"&by_escapes=1&random="+Math.random();
+fetch(escapeUrl2, {
+  method: "GET",
+  headers: {
+    "X-Galaxy-User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "X-Galaxy-Lng": "en",
+    "X-Galaxy-Client-Ver": "9.5",
+  },
+}).then(r => r.text()).then(d => {
+  console.log("Auto-escape response:", d);
+  document.getElementById("sec").innerHTML += ">>> ESCAPE RESPONSE: " + d.substring(0, 100) + "\r\n";
+}).catch(e => {
+  console.error("Auto-escape failed:", e);
+  document.getElementById("sec").innerHTML += ">>> ESCAPE ERROR: " + e.message + "\r\n";
+});
 }
           }
           if(snippets[0] === "452" && snippets[1] === " :Você") {
@@ -1212,14 +1242,15 @@ let escape = document.getElementById("escape");
        };
        document.getElementById("escape").addEventListener("click", async () => {
         try {
-          let res = axios.get(
-            "https://galaxy.mobstudio.ru/services/?userID="+useridg+"&password="+passwordg+"&a=jail_free&usercur="+useridg+"&by_escapes=1&random=0.6548361149689268",
+          console.log("Escape button clicked - attempting prison escape...");
+          const response = await fetch(
+            "https://galaxy.mobstudio.ru/services/?userID="+useridg+"&password="+passwordg+"&a=jail_free&usercur="+useridg+"&by_escapes=1&random="+Math.random(),
             {
+              method: "GET",
               headers: {
-                "X-Galaxy-User-Agent":
-                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+                "X-Galaxy-User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
                 "X-Galaxy-Scr-Dpi": "1",
-                "X-Galaxy-Lng": "pt",
+                "X-Galaxy-Lng": "en",
                 "X-Galaxy-Scr-W": "700",
                 "X-Galaxy-Scr-H": "657",
                 "X-Galaxy-Os-Ver": "1",
@@ -1231,8 +1262,12 @@ let escape = document.getElementById("escape");
               },
             }
           );
+          const data = await response.text();
+          console.log("Escape response:", data);
+          document.getElementById("sec").innerHTML += "ESCAPE API Response: " + data.substring(0, 100) + "\r\n";
         } catch (err) {
-          console.log(err);
+          console.error("Escape error:", err);
+          document.getElementById("sec").innerHTML += "ESCAPE ERROR: " + err.message + "\r\n";
         }
       });
       document.getElementById("plntgo").addEventListener("click", () => {
